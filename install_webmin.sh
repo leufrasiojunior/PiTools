@@ -51,14 +51,13 @@ notify_package_updates_available() {
 }
 
 GetInstallWeb(){
-local TEMPFILE=(mktemp)
+TEMPFILE=$(mktemp)
 	echo "Obtendo o link de download... Aguarde!"
 	curl -sSL http://www.webmin.com/deb.html &>> "${TEMPFILE}"
 		CMD_DOWN=$(grep 'wget' "${TEMPFILE}" | sed 's/<[^>]*>//g' | head -1 | cut -d " " -f2)
-	
+	sleep 3
 	echo "${CMD_DOWN}"
-	echo "O link está correto (s/n): "
-		read link
+	read -p "O link está correto (s/n): " link
 	
 	echo "${link}"
 		link2=$(echo "$link" | tr 'N' 'n')
@@ -73,7 +72,7 @@ local TEMPFILE=(mktemp)
 
 InstallWeb(){
 GetInstallWeb
-wget "${CMD_DOWN} -O webmin.deb"
+wget -O webmin.deb "${CMD_DOWN}"
 dpkg -i webmin.deb
 rm webmin.deb
 }
@@ -115,8 +114,8 @@ main(){
         # Check if it is actually installed
         # If it isn't, exit because the install cannot complete
         if [[ $(dpkg-query -s sudo) ]];then
-            export SUDO="sudo"
-            export SUDOE="sudo -E"
+            echo "::: Please, run with sudo/root"
+			exit 1
         else
             echo "::: Please install sudo or run this as root."
             exit 1
