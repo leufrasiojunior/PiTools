@@ -72,6 +72,7 @@ local TEMPFILE=(mktemp)
 }
 
 InstallWeb(){
+GetInstallWeb
 wget "${CMD_DOWN} -O webmin.deb"
 dpkg -i webmin.deb
 rm webmin.deb
