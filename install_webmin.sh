@@ -41,6 +41,7 @@ notify_package_updates_available() {
   updatesToInstall=$(eval "${PKG_COUNT}")
   echo " done!"
   echo ":::"
+  sleep 0.9
   if [[ ${updatesToInstall} -eq "0" ]]; then
     echo "::: Your system is up to date! Continuing with Webmin installation..."
   else
@@ -52,17 +53,15 @@ notify_package_updates_available() {
 
 GetInstallWeb(){
 TEMPFILE=$(mktemp)
-	echo "Obtendo o link de download... Aguarde!"
+	echo "Get download link. Wait..."
 	curl -sSL http://www.webmin.com/deb.html &>> "${TEMPFILE}"
 		CMD_DOWN=$(grep 'wget' "${TEMPFILE}" | sed 's/<[^>]*>//g' | head -1 | cut -d " " -f2)
 	sleep 3
 	echo "${CMD_DOWN}"
 	read -p "O link está correto (s/n): " link
-	
 	echo "${link}"
 		link2=$(echo "$link" | tr 'N' 'n')
 	echo $link2
-	
 	if [[ "$link2" = "n" ]]; then
 			read -p "Favor, obter o link no site http://www.webmin.com/download.html e colar aqui: " CMD_DOWN
 	fi
@@ -71,16 +70,16 @@ TEMPFILE=$(mktemp)
 }
 
 InstallWeb(){
-GetInstallWeb
-wget -O webmin.deb "${CMD_DOWN}"
-dpkg -i webmin.deb
-rm webmin.deb
+	GetInstallWeb
+	wget -O webmin.deb "${CMD_DOWN}"
+	dpkg -i webmin.deb
+	rm webmin.deb
 }
 
 
 dependencies(){
-#install dependencies
-debconf-apt-progress -- apt-get --yes --install-recommends install perl libnet-ssleay-perl openssl libauthen-pam-perl libpam-runtime libio-pty-perl apt-show-versions python
+	#install dependencies
+	debconf-apt-progress -- apt-get --yes --install-recommends install perl libnet-ssleay-perl openssl libauthen-pam-perl libpam-runtime libio-pty-perl apt-show-versions python
 }
 
 update_package_cache(){
@@ -91,7 +90,6 @@ update_package_cache(){
   timestamp=$(stat -c %Y ${PKG_CACHE})
   timestampAsDate=$(date -d @"${timestamp}" "+%b %e")
   today=$(date "+%b %e")
-
 
   if [ ! "${today}" == "${timestampAsDate}" ]; then
     #update package lists
